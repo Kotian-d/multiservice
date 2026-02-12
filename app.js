@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import puppeteer from "puppeteer";
 import { Technician } from "./model/technician_schema.js";
 import dotenv from "dotenv";
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
 
 dotenv.config();
 
@@ -10,6 +12,12 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Get the full file path from the current module's URL
+const __filename = fileURLToPath(import.meta.url);
+
+// Extract the directory name from the file path
+const __dirname = dirname(__filename);
 
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
