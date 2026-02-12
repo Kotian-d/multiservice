@@ -176,7 +176,15 @@ app.post("/mservice/", async (req, res) => {
   //await browser.close();
 });
 
-app.listen(7991, async () => {
+// --- Start Server ---
+const startServer = async () => {
   await connectDb();
-  console.log("Server is running on port 7991");
-});
+
+  // Add app middlewares, routes here
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+};
+
+startServer();
