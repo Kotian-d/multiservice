@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technicians Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/"><i class="fas fa-tools"></i> TechDashboard</a>
+      <div class="navbar-nav ms-auto">
+      <!--  <a class="nav-link" href="/dashboard">Dashboard</a> -->
+       <!--  <a class="nav-link" href="/technicians">Technicians</a> -->
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h2><i class="fas fa-users-cog text-primary"></i> Technicians (<%= totalCount %>)</h2>
+          <a href="/technicians/new" class="btn btn-success">
+            <i class="fas fa-plus"></i> Add Technician
+          </a>
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <form method="GET" class="row g-3">
+              <div class="col-md-4">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search by name/phone..." value="<%= search %>">
+              </div>
+              <div class="col-md-3">
+                <select name="status" class="form-select">
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">InActive</option>
+                  <option value="busy">Busy</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                  <i class="fas fa-search"></i> Filter
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3">
+            <div class="card bg-success text-white">
+              <div class="card-body">
+                <h5><%= activeCount %></h5>
+                <small>Active</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-warning text-white">
+              <div class="card-body">
+                <h5><%= inactiveCount %></h5>
+                <small>Inactive</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-secondary text-white">
+              <div class="card-body">
+                <h5><%= busyCount %></h5>
+                <small>Busy</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="card bg-info text-white">
+              <div class="card-body">
+                <h5><%= technicians.reduce((sum, t) => sum + t.sessions, 0) %></h5>
+                <small>Total Sessions</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Technicians Table -->
+        <div class="card shadow">
+          <div class="card-header d-flex justify-content-between">
+            <strong>All Technicians</strong>
+            <span class="badge bg-primary">Page <%= currentPage %> of <%= totalPages %></span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th><i class="fas fa-user"></i> Name</th>
+                    <th><i class="fas fa-mobile-alt"></i> Phone</th>
+                    <th><i class="fas fa-map-marker-alt"></i> Location</th>
+                    <th><i class="fas fa-star"></i> Rating</th>
+                    <th><i class="fas fa-clock"></i> Last Login</th>
+                    <th>Sessions</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% technicians.forEach(tech => { %>
+                  <tr>
+                    <td>
+                      <strong><%= tech.name %></strong>
+                      <br><small class="text-muted">ID: #<%= tech.technicianId %></small>
+                    </td>
+                    <td>
+                      <a href="tel:<%= tech.phone %>" class="text-decoration-none">
+                        <%= tech.phone %>
+                      </a>
+                    </td>
+                    <td><span class="badge bg-light text-dark"><%= tech.lat %>, <%= tech.long %></span></td>
+                    <td>
+                      <div class="star-rating">
+                        <% for(let i = 1; i <= 5; i++) { %>
+                          <i class="fas fa-star <%= i <= Math.floor(tech.rating) ? 'text-warning' : 'text-muted' %>"></i>
+                        <% } %>
+                        <span class="ms-1"><%= tech?.rating %></span>
+                      </div>
+                    </td>
+                    <td><small class="text-muted"><%= new Date(tech.lastLogin).toLocaleDateString() %></small></td>
+                    <td><span class="badge bg-info"><%= tech.sessions %></span></td>
+                    <td>
+                      <% const statusClass = tech.status === "active" ? 'bg-success' : tech.status === "inactive" ? 'bg-secondary' : 'bg-warning'; %>
+                      <span class="badge <%= statusClass %>"><%= tech.status === "active" ? 'Active' : tech.status === "inactive" ? 'Inactive' : 'Pending' %></span>
+                    </td>
+                    <td>
+                      <div class="btn-group btn-group-sm" role="group">
+                        <a href="/technicians/<%= tech._id %>" class="btn btn-outline-primary">
+                          <i class="fa-brands fa-android"></i>
+                        </a>
+                        <a href="/technicians/<%= tech._id %>/edit" class="btn btn-outline-warning">
+                          <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn btn-outline-danger" onclick="confirmDelete('<%= tech._id %>')">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <div>
+              Showing <%= (currentPage-1)*10 + 1 %> to <%= Math.min(currentPage*10, technicians.length) %> of <%= technicians.length %> technicians
+            </div>
+            <nav>
+              <ul class="pagination pagination-sm mb-0">
+                <% if(hasPrev) { %>
+                <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage - 1 %>&search=<%= search %>">Previous</a>
+                </li>
+                <% } %>
+                
+                <% for(let i = 1; i <= totalPages; i++) { %>
+                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                  <a class="page-link" href="?page=<%= i %>&search=<%= search %>"><%= i %></a>
+                </li>
+                <% } %>
+                
+                <% if(hasNext) { %>
+                <li class="page-item">
+                  <a class="page-link" href="?page=<%= currentPage + 1 %>&search=<%= search %>">Next</a>
+                </li>
+                <% } %>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function confirmDelete(id) {
+      if(confirm('Delete technician?')) {
+        window.location.href = `/technicians/${id}?_method=DELETE`;
+      }
+    }
+  </script>
+</body>
+</html>

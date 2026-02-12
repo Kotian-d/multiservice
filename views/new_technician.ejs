@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Technician</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-user-plus me-2"></i>Add Technician</h4>
+          </div>
+          <div class="card-body p-4">
+            
+            <% if (errors && errors.length > 0) { %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% errors.forEach(error => { %>
+                <li><%= error.msg %></li>
+                <% }) %>
+              </ul>
+            </div>
+            <% } %>
+
+            <form method="POST" action="/technicians/new">
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Name *</label>
+                  <input type="text" class="form-control <%= errors && errors.find(e => e.path === 'name') ? 'is-invalid' : '' %>" 
+                         name="name" value="<%= inputData ? inputData.name : '' %>" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Technician ID *</label>
+                  <input type="text" class="form-control <%= errors && errors.find(e => e.path === 'technicianId') ? 'is-invalid' : '' %>" 
+                         name="technicianId" value="<%= inputData ? inputData.technicianId : '' %>" required>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Phone *</label>
+                  <input type="tel" class="form-control <%= errors && errors.find(e => e.path === 'phone') ? 'is-invalid' : '' %>" 
+                         name="phone" value="<%= inputData ? inputData.phone : '' %>" placeholder="+919876543210" required>
+                  <div class="form-text">Format: +91XXXXXXXXXX</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Rating (0-5) *</label>
+                  <input type="number" step="0.1" min="0" max="5" 
+                         class="form-control <%= errors && errors.find(e => e.path === 'rating') ? 'is-invalid' : '' %>" 
+                         name="rating" value="<%= inputData ? inputData.rating : '' %>" required>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Latitude *</label>
+                  <input type="number" step="any" 
+                         class="form-control <%= errors && errors.find(e => e.path === 'lat') ? 'is-invalid' : '' %>" 
+                         name="lat" value="<%= inputData ? inputData.lat : '' %>" placeholder="13.2626725" required>    
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label fw-bold">Longitude *</label>
+                  <input type="number" step="any" 
+                         class="form-control <%= errors && errors.find(e => e.path === 'long') ? 'is-invalid' : '' %>" 
+                         name="long" value="<%= inputData ? inputData.long : '' %>" placeholder="74.7692824" required>
+
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold">Current Location *</label>
+                <input type="text" class="form-control <%= errors && errors.find(e => e.path === 'currentlocation') ? 'is-invalid' : '' %>" 
+                       name="currentlocation" value="<%= inputData ? inputData.currentlocation : '' %>" placeholder="" required>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label fw-bold">Status *</label>
+                <select class="form-select <%= errors && errors.find(e => e.path === 'status') ? 'is-invalid' : '' %>" name="status" required>
+                  <option value="">Select status</option>
+                  <option value="offline" <%= inputData && inputData.status === 'offline' ? 'selected' : '' %>>Offline</option>
+                  <option value="active" <%= inputData && inputData.status === 'active' ? 'selected' : '' %>>Active</option>
+                  <option value="busy" <%= inputData && inputData.status === 'busy' ? 'selected' : '' %>>Busy</option>
+                </select>
+              </div>
+
+              <div class="d-grid gap-2 d-md-flex justify-content-end">
+                <a href="/" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary px-4">Add Technician</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Auto-format phone
+    document.querySelector('input[name="phone"]').addEventListener('input', function(e) {
+      let val = e.target.value.replace(/\D/g, '');
+      if (val.length === 10) {
+        e.target.value = '+91' + val;
+      }
+    });
+
+    // Bengaluru defaults
+    document.querySelector('input[name="lat"]').value = document.querySelector('input[name="lat"]').value || '12.9716';
+    document.querySelector('input[name="long"]').value = document.querySelector('input[name="long"]').value || '77.5946';
+  </script>
+</body>
+</html>
